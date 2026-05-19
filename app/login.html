@@ -19,6 +19,25 @@
 
   <script src="../config.js"></script>
   <script>window.M7_BASE = "../";</script>
+
+  <style>
+    .password-wrap { position: relative; }
+    .password-wrap .input { padding-inline-end: 64px; }
+    .password-toggle {
+      position: absolute;
+      inset-block-start: 50%;
+      inset-inline-end: 6px;
+      transform: translateY(-50%);
+      padding: 4px 10px;
+      font-size: var(--fs-xs);
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: var(--radius-1);
+    }
+    .password-toggle:hover { color: var(--text); background: var(--bg-subtle); }
+  </style>
 </head>
 <body>
   <nav class="nav">
@@ -41,7 +60,7 @@
     <div class="card auth-card fade-in">
       <form id="login-form" novalidate>
         <h1 data-i18n="auth.login_title">Sign in</h1>
-        <p class="subtitle" data-i18n="auth.login_subtitle">Enter your email and we'll send you a magic link.</p>
+        <p class="subtitle" data-i18n="auth.login_subtitle">Enter your email and password to access your dashboard.</p>
 
         <div class="field">
           <label for="email" class="field-label" data-i18n="auth.email_label">Email address</label>
@@ -54,29 +73,36 @@
             required
             data-i18n-placeholder="auth.email_placeholder"
             placeholder="example@m7studio.app"/>
-          <div class="field-error" id="login-error"></div>
+          <div class="field-error" id="email-error"></div>
         </div>
+
+        <div class="field">
+          <label for="password" class="field-label" data-i18n="auth.password_label">Password</label>
+          <div class="password-wrap">
+            <input
+              id="password"
+              type="password"
+              class="input"
+              autocomplete="current-password"
+              required
+              data-i18n-placeholder="auth.password_placeholder"
+              placeholder="•••••••"/>
+            <button type="button" id="password-toggle" class="password-toggle" data-i18n="auth.show_password">Show</button>
+          </div>
+          <div class="field-error" id="password-error"></div>
+        </div>
+
+        <div class="field-error" id="form-error" style="text-align:center;"></div>
 
         <button type="submit" id="submit-btn" class="btn btn-primary btn-lg btn-block">
           <span class="btn__spinner spinner hidden"></span>
-          <span class="btn__label" data-i18n="auth.send_link">Send magic link</span>
+          <span class="btn__label" id="submit-label" data-i18n="auth.signin_button">Sign in</span>
         </button>
 
-        <a href="../index.html" class="btn btn-ghost btn-sm text-center" style="align-self:center;" data-i18n="auth.back_home">Back to home</a>
+        <a href="../index.html" class="btn btn-ghost btn-sm text-center" style="align-self:center;margin-top:var(--space-3);" data-i18n="auth.back_home">Back to home</a>
       </form>
 
-      <div id="login-sent" class="hidden" style="text-align:center;">
-        <div class="feature-card__icon" style="margin:0 auto var(--space-4);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        </div>
-        <h2 data-i18n="auth.link_sent_title">Check your inbox</h2>
-        <p class="text-muted mt-2">
-          <span data-i18n="auth.link_sent_desc">We sent a link to</span>
-          <strong id="sent-email" style="display:block;margin-top:6px;direction:ltr;"></strong>
-        </p>
-      </div>
-
-      <div id="login-completing" class="hidden text-center">
+      <div id="auth-completing" class="hidden text-center">
         <span class="spinner" style="color:var(--brand-1);"></span>
         <p class="text-muted mt-4" data-i18n="auth.completing">Completing sign-in…</p>
       </div>
