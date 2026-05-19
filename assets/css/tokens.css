@@ -1,0 +1,127 @@
+/* M7_Studio — design tokens.
+   Single source of truth for colors, spacing, type, radii, motion. */
+
+:root {
+  /* ---------- brand & palette ---------- */
+  --brand-1: #6366f1;          /* indigo  */
+  --brand-2: #a855f7;          /* violet  */
+  --brand-3: #06b6d4;          /* cyan accent */
+  --brand-gradient: linear-gradient(135deg, var(--brand-1) 0%, var(--brand-2) 100%);
+
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger:  #ef4444;
+  --info:    var(--brand-3);
+
+  /* ---------- light theme ---------- */
+  --bg:           #f7f8fc;
+  --bg-elevated:  #ffffff;
+  --bg-subtle:    #eef0f7;
+  --surface:      rgba(255,255,255,0.7);
+  --surface-strong: #ffffff;
+  --border:       rgba(15,23,42,0.10);
+  --border-strong:rgba(15,23,42,0.18);
+  --text:         #0f172a;
+  --text-muted:   #475569;
+  --text-soft:    #64748b;
+  --shadow-1: 0 1px 2px rgba(15,23,42,.06), 0 1px 1px rgba(15,23,42,.04);
+  --shadow-2: 0 8px 24px rgba(15,23,42,.08), 0 2px 6px rgba(15,23,42,.04);
+  --shadow-3: 0 24px 60px rgba(15,23,42,.18), 0 6px 14px rgba(15,23,42,.08);
+  --shadow-glow: 0 0 0 4px rgba(99,102,241,.18);
+
+  /* ---------- spacing scale ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* ---------- radii ---------- */
+  --radius-1: 6px;
+  --radius-2: 10px;
+  --radius-3: 14px;
+  --radius-4: 20px;
+  --radius-pill: 999px;
+
+  /* ---------- typography ---------- */
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-ar:   "Cairo", "IBM Plex Sans Arabic", "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --fs-xs:  12px;
+  --fs-sm:  13px;
+  --fs-base:15px;
+  --fs-md:  16px;
+  --fs-lg:  18px;
+  --fs-xl:  22px;
+  --fs-2xl: 28px;
+  --fs-3xl: 36px;
+  --fs-4xl: 48px;
+
+  --lh-tight:  1.2;
+  --lh-snug:   1.35;
+  --lh-normal: 1.55;
+  --lh-loose:  1.75;
+
+  /* ---------- motion ---------- */
+  --ease: cubic-bezier(.4,0,.2,1);
+  --ease-out: cubic-bezier(0,0,.2,1);
+  --ease-spring: cubic-bezier(.34,1.56,.64,1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+
+  /* ---------- layout ---------- */
+  --container:  1200px;
+  --container-narrow: 720px;
+  --nav-height: 64px;
+
+  /* ---------- z-index ---------- */
+  --z-sticky: 100;
+  --z-nav:    200;
+  --z-modal:  900;
+  --z-toast:  1000;
+}
+
+/* ---------- dark theme ---------- */
+:root[data-theme="dark"] {
+  --bg:           #0b1020;
+  --bg-elevated:  #11172d;
+  --bg-subtle:    #0e1428;
+  --surface:      rgba(255,255,255,0.04);
+  --surface-strong: #161c33;
+  --border:       rgba(255,255,255,0.08);
+  --border-strong:rgba(255,255,255,0.16);
+  --text:         #eef1ff;
+  --text-muted:   #b6bedb;
+  --text-soft:    #8089a8;
+  --shadow-1: 0 1px 2px rgba(0,0,0,.4);
+  --shadow-2: 0 8px 24px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.2);
+  --shadow-3: 0 24px 60px rgba(0,0,0,.55), 0 6px 14px rgba(0,0,0,.3);
+  --shadow-glow: 0 0 0 4px rgba(99,102,241,.32);
+}
+
+/* respect system pref when no explicit choice */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg:           #0b1020;
+    --bg-elevated:  #11172d;
+    --bg-subtle:    #0e1428;
+    --surface:      rgba(255,255,255,0.04);
+    --surface-strong: #161c33;
+    --border:       rgba(255,255,255,0.08);
+    --border-strong:rgba(255,255,255,0.16);
+    --text:         #eef1ff;
+    --text-muted:   #b6bedb;
+    --text-soft:    #8089a8;
+    --shadow-1: 0 1px 2px rgba(0,0,0,.4);
+    --shadow-2: 0 8px 24px rgba(0,0,0,.35);
+    --shadow-3: 0 24px 60px rgba(0,0,0,.55);
+  }
+}

@@ -1,0 +1,22 @@
+/* M7_Studio — RTL-specific tweaks.
+   Most layout uses logical properties (margin-inline-start, etc.) so it just works.
+   Only physical-direction transforms or icons need fixing here. */
+
+html[dir="rtl"] .input,
+html[dir="rtl"] .textarea,
+html[dir="rtl"] .select {
+  text-align: start;
+}
+
+html[dir="rtl"] .preview-link,
+html[dir="rtl"] .qr-card__url {
+  /* keep URLs LTR even inside an RTL page */
+  direction: ltr;
+  text-align: start;
+}
+
+/* Reverse direction for arrows that imply forward progression */
+html[dir="rtl"] .icon-flip { transform: scaleX(-1); }
+
+/* Chart.js tooltips look weird with RTL — reset to LTR */
+html[dir="rtl"] canvas + .chartjs-tooltip { direction: ltr; }

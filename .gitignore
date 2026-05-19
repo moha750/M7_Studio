@@ -1,0 +1,34 @@
+# Security — NEVER commit these
+.mcp.json
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dependencies (we use CDN, but just in case)
+node_modules/
+
+# Build / cache
+dist/
+build/
+.cache/
+.parcel-cache/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local Supabase (CLI generated)
+supabase/.branches
+supabase/.temp

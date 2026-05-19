@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-i18n-title="settings.title">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Settings · M7 Studio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <link rel="stylesheet" href="../assets/css/tokens.css"/>
+  <link rel="stylesheet" href="../assets/css/base.css"/>
+  <link rel="stylesheet" href="../assets/css/components.css"/>
+  <link rel="stylesheet" href="../assets/css/layout.css"/>
+  <link rel="stylesheet" href="../assets/css/pages.css"/>
+  <link rel="stylesheet" href="../assets/css/rtl.css"/>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236366f1'/%3E%3Ctext x='50%25' y='52%25' font-family='Inter,sans-serif' font-size='14' font-weight='800' fill='white' text-anchor='middle' dominant-baseline='middle'%3EM7%3C/text%3E%3C/svg%3E"/>
+
+  <script src="../config.js"></script>
+  <script>window.M7_BASE = "../";</script>
+</head>
+<body>
+  <div id="app-nav"></div>
+
+  <main class="page container-narrow">
+    <div class="page__header">
+      <div>
+        <h1 class="page__title" data-i18n="settings.title">Settings</h1>
+      </div>
+    </div>
+
+    <section class="settings-section">
+      <h2 data-i18n="settings.section_account">Account</h2>
+      <div class="grid" style="gap:var(--space-4);">
+        <div class="field">
+          <label for="email" class="field-label" data-i18n="settings.email">Email</label>
+          <input id="email" class="input" type="email" disabled/>
+        </div>
+        <div class="field">
+          <label for="display-name" class="field-label" data-i18n="settings.display_name">Display name</label>
+          <input id="display-name" class="input" type="text"
+                 data-i18n-placeholder="settings.display_name_placeholder"
+                 placeholder="Mohammad"/>
+        </div>
+        <div>
+          <button id="save-account" class="btn btn-primary" data-i18n="settings.save">Save changes</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h2 data-i18n="settings.section_preferences">Preferences</h2>
+      <div class="field">
+        <label class="field-label" data-i18n="settings.language">Language</label>
+        <div class="radio-chips">
+          <button type="button" data-set-locale="ar" class="radio-chip__label">العربية</button>
+          <button type="button" data-set-locale="en" class="radio-chip__label">English</button>
+        </div>
+      </div>
+      <div class="field mt-6">
+        <label class="field-label" data-i18n="settings.theme">Theme</label>
+        <div class="radio-chips">
+          <button type="button" data-set-theme="system" class="radio-chip__label" data-i18n="settings.theme_system">System</button>
+          <button type="button" data-set-theme="light"  class="radio-chip__label" data-i18n="settings.theme_light">Light</button>
+          <button type="button" data-set-theme="dark"   class="radio-chip__label" data-i18n="settings.theme_dark">Dark</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="settings-section settings-section--danger">
+      <h2 data-i18n="settings.section_danger">Danger zone</h2>
+      <button id="logout" class="btn btn-danger" data-i18n="settings.logout">Sign out</button>
+    </section>
+  </main>
+
+  <script type="module" src="../assets/js/settings.js"></script>
+</body>
+</html>

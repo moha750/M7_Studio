@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-i18n-title="create.title_edit">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Edit · M7 Studio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <link rel="stylesheet" href="../assets/css/tokens.css"/>
+  <link rel="stylesheet" href="../assets/css/base.css"/>
+  <link rel="stylesheet" href="../assets/css/components.css"/>
+  <link rel="stylesheet" href="../assets/css/layout.css"/>
+  <link rel="stylesheet" href="../assets/css/pages.css"/>
+  <link rel="stylesheet" href="../assets/css/rtl.css"/>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236366f1'/%3E%3Ctext x='50%25' y='52%25' font-family='Inter,sans-serif' font-size='14' font-weight='800' fill='white' text-anchor='middle' dominant-baseline='middle'%3EM7%3C/text%3E%3C/svg%3E"/>
+
+  <script src="../config.js"></script>
+  <script>window.M7_BASE = "../";</script>
+</head>
+<body>
+  <div id="app-nav"></div>
+
+  <main class="page container">
+    <div class="page__header">
+      <h1 id="page-title" class="page__title" data-i18n="create.title_edit">Edit code</h1>
+    </div>
+
+    <div class="split">
+      <div>
+        <div class="card mb-6">
+          <div class="section-title" data-i18n="create.section_basics">Basics</div>
+          <div class="grid" style="gap:var(--space-4);">
+            <div class="field">
+              <label for="name" class="field-label" data-i18n="create.name_label">Internal name</label>
+              <input id="name" class="input" type="text" data-i18n-placeholder="create.name_placeholder" placeholder="…"/>
+              <div id="error-name" class="field-error"></div>
+            </div>
+            <div class="field">
+              <label for="target-url" class="field-label" data-i18n="create.target_url_label">Destination URL</label>
+              <input id="target-url" class="input" type="url" inputmode="url" data-i18n-placeholder="create.target_url_placeholder" placeholder="https://example.com/landing" dir="ltr"/>
+              <div id="error-target" class="field-error"></div>
+            </div>
+            <label class="switch">
+              <input id="is-active" type="checkbox" checked/>
+              <span class="switch__track"></span>
+              <span data-i18n="create.is_active_label">Enable code</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div id="controls"></div>
+        </div>
+      </div>
+
+      <aside class="split__preview">
+        <div class="card">
+          <div class="section-title" data-i18n="create.section_preview">Preview</div>
+          <div class="preview-stage"><div id="preview"></div></div>
+          <div class="preview-link">
+            <span data-i18n="create.preview_link" style="color:var(--text-soft);">Dynamic link:</span>
+            <code id="preview-link"></code>
+            <button id="copy-link-btn" class="btn btn-ghost btn-sm btn-icon" title="Copy">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+          <button id="save-btn" class="btn btn-primary btn-block btn-lg mt-6">
+            <span class="btn__label" data-i18n="create.save">Save code</span>
+          </button>
+          <div id="export-row" class="export-row">
+            <button id="download-png"  class="btn btn-secondary btn-sm" data-i18n="create.download_png">Download PNG</button>
+            <button id="download-svg"  class="btn btn-secondary btn-sm" data-i18n="create.download_svg">Download SVG</button>
+            <button id="download-jpeg" class="btn btn-secondary btn-sm" data-i18n="create.download_jpeg">Download JPEG</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script type="module" src="../assets/js/create.js"></script>
+</body>
+</html>

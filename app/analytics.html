@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-i18n-title="analytics.title">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Analytics · M7 Studio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <link rel="stylesheet" href="../assets/css/tokens.css"/>
+  <link rel="stylesheet" href="../assets/css/base.css"/>
+  <link rel="stylesheet" href="../assets/css/components.css"/>
+  <link rel="stylesheet" href="../assets/css/layout.css"/>
+  <link rel="stylesheet" href="../assets/css/pages.css"/>
+  <link rel="stylesheet" href="../assets/css/rtl.css"/>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236366f1'/%3E%3Ctext x='50%25' y='52%25' font-family='Inter,sans-serif' font-size='14' font-weight='800' fill='white' text-anchor='middle' dominant-baseline='middle'%3EM7%3C/text%3E%3C/svg%3E"/>
+
+  <script src="../config.js"></script>
+  <script>window.M7_BASE = "../";</script>
+</head>
+<body>
+  <div id="app-nav"></div>
+
+  <main class="page container">
+    <div class="page__header">
+      <div>
+        <h1 id="page-title" class="page__title">…</h1>
+        <p id="page-subtitle" class="page__subtitle" style="direction:ltr;font-family:var(--font-mono);font-size:var(--fs-sm);"></p>
+      </div>
+      <div class="flex gap-2">
+        <a href="./dashboard.html" class="btn btn-ghost btn-sm" data-i18n="common.back">Back</a>
+        <button id="export-csv" class="btn btn-secondary btn-sm" data-i18n="analytics.export_csv">Export CSV</button>
+      </div>
+    </div>
+
+    <!-- Top bar: QR thumb + range filter + actions -->
+    <div class="card mb-8">
+      <div class="flex between" style="flex-wrap:wrap;gap:var(--space-6);align-items:center;">
+        <div class="flex gap-4" style="align-items:center;">
+          <div id="qr-thumb" style="width:120px;height:120px;background:var(--bg-subtle);border-radius:var(--radius-2);padding:var(--space-3);"></div>
+          <div>
+            <div class="preview-link" style="margin:0;max-width:380px;">
+              <code id="preview-link"></code>
+              <button id="copy-link-btn" class="btn btn-ghost btn-sm btn-icon" title="Copy">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+            <button id="download-qr" class="btn btn-secondary btn-sm mt-2" data-i18n="analytics.download_qr">Download QR</button>
+          </div>
+        </div>
+        <div>
+          <div class="field-label mb-2" data-i18n="analytics.range_label">Date range</div>
+          <div class="radio-chips">
+            <button type="button" data-range="7"  class="radio-chip__label" data-i18n="analytics.range_7">7 days</button>
+            <button type="button" data-range="30" class="radio-chip__label" data-i18n="analytics.range_30">30 days</button>
+            <button type="button" data-range="90" class="radio-chip__label" data-i18n="analytics.range_90">90 days</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-card__label" data-i18n="analytics.total_scans">Total scans</div>
+        <div id="stat-total" class="stat-card__value">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label" data-i18n="analytics.unique_scans">Unique scans</div>
+        <div id="stat-unique" class="stat-card__value">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label" data-i18n="analytics.last_scan">Last scan</div>
+        <div id="stat-last" class="stat-card__value text-lg">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label" data-i18n="analytics.scans_per_day">Avg / day</div>
+        <div id="stat-perday" class="stat-card__value">0</div>
+      </div>
+    </div>
+
+    <!-- Timeline + Countries -->
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3 data-i18n="analytics.chart_timeline">Scans over time</h3>
+        <div style="position:relative;height:280px;"><canvas id="chart-timeline"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3 data-i18n="analytics.chart_countries">Top countries</h3>
+        <div style="position:relative;height:280px;"><canvas id="chart-countries"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Devices + Browsers + OS -->
+    <div class="chart-grid chart-grid--3">
+      <div class="chart-card">
+        <h3 data-i18n="analytics.chart_devices">Device type</h3>
+        <div style="position:relative;height:240px;"><canvas id="chart-devices"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3 data-i18n="analytics.chart_browsers">Browsers</h3>
+        <div style="position:relative;height:240px;"><canvas id="chart-browsers"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3 data-i18n="analytics.chart_os">Operating systems</h3>
+        <div style="position:relative;height:240px;"><canvas id="chart-os"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Hour-of-day -->
+    <div class="chart-card mb-8">
+      <h3 data-i18n="analytics.chart_hour_dow">Time of day</h3>
+      <div style="position:relative;height:200px;"><canvas id="chart-hourly"></canvas></div>
+    </div>
+
+    <!-- Recent scans -->
+    <div class="card mb-8">
+      <h3 class="text-lg semibold mb-4" data-i18n="analytics.table_recent">Recent scans</h3>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th data-i18n="analytics.column_time">Time</th>
+              <th data-i18n="analytics.column_country">Country</th>
+              <th data-i18n="analytics.column_device">Device</th>
+              <th data-i18n="analytics.column_browser">Browser</th>
+              <th data-i18n="analytics.column_os">OS</th>
+            </tr>
+          </thead>
+          <tbody id="recent-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- URL history -->
+    <div class="card">
+      <h3 class="text-lg semibold mb-4" data-i18n="analytics.table_history">URL change history</h3>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th data-i18n="analytics.column_time">Time</th>
+              <th data-i18n="analytics.column_old_url">Old URL</th>
+              <th data-i18n="analytics.column_new_url">New URL</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="../assets/js/analytics.js"></script>
+</body>
+</html>

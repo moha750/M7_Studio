@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-i18n-title="dashboard.title">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dashboard · M7 Studio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <link rel="stylesheet" href="../assets/css/tokens.css"/>
+  <link rel="stylesheet" href="../assets/css/base.css"/>
+  <link rel="stylesheet" href="../assets/css/components.css"/>
+  <link rel="stylesheet" href="../assets/css/layout.css"/>
+  <link rel="stylesheet" href="../assets/css/pages.css"/>
+  <link rel="stylesheet" href="../assets/css/rtl.css"/>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236366f1'/%3E%3Ctext x='50%25' y='52%25' font-family='Inter,sans-serif' font-size='14' font-weight='800' fill='white' text-anchor='middle' dominant-baseline='middle'%3EM7%3C/text%3E%3C/svg%3E"/>
+
+  <script src="../config.js"></script>
+  <script>window.M7_BASE = "../";</script>
+</head>
+<body>
+  <div id="app-nav"></div>
+
+  <main class="page container">
+    <div class="page__header">
+      <div>
+        <h1 class="page__title" data-i18n="dashboard.title">Your QR codes</h1>
+      </div>
+      <div class="flex gap-2">
+        <button id="refresh-btn" class="btn btn-secondary btn-icon" title="Refresh">
+          <span class="spinner hidden"></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></svg>
+        </button>
+        <a class="btn btn-primary" href="./create.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span data-i18n="dashboard.new">New code</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="dashboard__toolbar">
+      <div class="dashboard__search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="search" type="search" class="input" data-i18n-placeholder="dashboard.search_placeholder" placeholder="Search a code…"/>
+      </div>
+    </div>
+
+    <div id="qr-grid" class="qr-grid"></div>
+
+    <div id="empty" class="empty hidden">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="14" y2="14.01"/><line x1="20" y1="14" x2="20" y2="14.01"/><line x1="14" y1="20" x2="14" y2="20.01"/><line x1="20" y1="20" x2="20" y2="20.01"/><line x1="14" y1="17" x2="17" y2="17"/><line x1="17" y1="20" x2="20" y2="20"/></svg>
+      <h3 data-i18n="dashboard.empty_title">No codes yet</h3>
+      <p data-i18n="dashboard.empty_desc">Create your first dynamic QR in under a minute.</p>
+      <a href="./create.html" class="btn btn-primary" data-i18n="dashboard.empty_cta">Create your first code</a>
+    </div>
+  </main>
+
+  <script type="module" src="../assets/js/dashboard.js"></script>
+</body>
+</html>

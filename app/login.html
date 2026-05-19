@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-i18n-title="auth.login_title">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sign in · M7 Studio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <link rel="stylesheet" href="../assets/css/tokens.css"/>
+  <link rel="stylesheet" href="../assets/css/base.css"/>
+  <link rel="stylesheet" href="../assets/css/components.css"/>
+  <link rel="stylesheet" href="../assets/css/layout.css"/>
+  <link rel="stylesheet" href="../assets/css/pages.css"/>
+  <link rel="stylesheet" href="../assets/css/rtl.css"/>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236366f1'/%3E%3Ctext x='50%25' y='52%25' font-family='Inter,sans-serif' font-size='14' font-weight='800' fill='white' text-anchor='middle' dominant-baseline='middle'%3EM7%3C/text%3E%3C/svg%3E"/>
+
+  <script src="../config.js"></script>
+  <script>window.M7_BASE = "../";</script>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav__inner">
+      <a class="brand" href="../index.html">
+        <span class="brand__mark">M7</span>
+        <span class="brand__name" data-i18n="meta.app_name">M7 Studio</span>
+      </a>
+      <div class="nav__spacer"></div>
+      <div class="nav__actions">
+        <div class="lang-toggle" role="group">
+          <button type="button" data-set-locale="ar">عربي</button>
+          <button type="button" data-set-locale="en">EN</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="auth-page">
+    <div class="card auth-card fade-in">
+      <form id="login-form" novalidate>
+        <h1 data-i18n="auth.login_title">Sign in</h1>
+        <p class="subtitle" data-i18n="auth.login_subtitle">Enter your email and we'll send you a magic link.</p>
+
+        <div class="field">
+          <label for="email" class="field-label" data-i18n="auth.email_label">Email address</label>
+          <input
+            id="email"
+            type="email"
+            class="input"
+            autocomplete="email"
+            inputmode="email"
+            required
+            data-i18n-placeholder="auth.email_placeholder"
+            placeholder="example@m7studio.app"/>
+          <div class="field-error" id="login-error"></div>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn btn-primary btn-lg btn-block">
+          <span class="btn__spinner spinner hidden"></span>
+          <span class="btn__label" data-i18n="auth.send_link">Send magic link</span>
+        </button>
+
+        <a href="../index.html" class="btn btn-ghost btn-sm text-center" style="align-self:center;" data-i18n="auth.back_home">Back to home</a>
+      </form>
+
+      <div id="login-sent" class="hidden" style="text-align:center;">
+        <div class="feature-card__icon" style="margin:0 auto var(--space-4);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <h2 data-i18n="auth.link_sent_title">Check your inbox</h2>
+        <p class="text-muted mt-2">
+          <span data-i18n="auth.link_sent_desc">We sent a link to</span>
+          <strong id="sent-email" style="display:block;margin-top:6px;direction:ltr;"></strong>
+        </p>
+      </div>
+
+      <div id="login-completing" class="hidden text-center">
+        <span class="spinner" style="color:var(--brand-1);"></span>
+        <p class="text-muted mt-4" data-i18n="auth.completing">Completing sign-in…</p>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="../assets/js/auth.js"></script>
+</body>
+</html>
