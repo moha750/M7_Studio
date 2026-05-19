@@ -1,18 +1,23 @@
 // M7_Studio — QR engine.
-// Thin wrapper around `qr-code-styling`. Centralizes:
+// Thin wrapper around `@qr-platform/qr-code.js`. Centralizes:
 //   • the default design config
 //   • config <-> form mapping
 //   • render / update / export
 //
-// Library docs: https://github.com/kozakdenys/qr-code-styling
+// Library docs: https://docs.qr-platform.com/qr-code.js/documentation
+// License: free for personal / non-commercial use.
 
-import QRCodeStyling from "https://esm.sh/qr-code-styling@1.8.4";
+import { QRCodeJs } from "https://esm.sh/@qr-platform/qr-code.js@0.20.14";
 
+// Full set of shapes supported by qr-code.js (camelCase, not kebab-case).
 export const DOTS_STYLES = [
-  "square", "dots", "rounded", "extra-rounded", "classy", "classy-rounded",
+  "dot", "rounded", "extraRounded", "classy", "classyRounded",
+  "square", "smallSquare", "tinySquare",
+  "verticalLine", "horizontalLine",
+  "star", "plus", "diamond", "randomDot",
 ];
-export const CORNER_SQUARE_STYLES = ["square", "dot", "extra-rounded"];
-export const CORNER_DOT_STYLES    = ["square", "dot"];
+export const CORNER_SQUARE_STYLES = ["square", "dot", "rounded", "classy", "outpoint", "inpoint"];
+export const CORNER_DOT_STYLES    = ["square", "dot", "rounded", "classy", "heart", "outpoint", "inpoint"];
 export const EC_LEVELS = ["L", "M", "Q", "H"];
 
 export function defaultConfig() {
@@ -23,9 +28,9 @@ export function defaultConfig() {
     margin: 8,
     qrOptions: { errorCorrectionLevel: "H" },
     dotsOptions: { type: "rounded", color: "#6366f1" },
-    backgroundOptions: { color: "#ffffff" },
-    cornersSquareOptions: { type: "extra-rounded", color: "#6366f1" },
-    cornersDotOptions:    { type: "dot",          color: "#6366f1" },
+    backgroundOptions: { color: "transparent" },
+    cornersSquareOptions: { type: "rounded", color: "#6366f1" },
+    cornersDotOptions:    { type: "rounded", color: "#6366f1" },
     imageOptions: { imageSize: 0.25, margin: 6, hideBackgroundDots: true, crossOrigin: "anonymous" },
     image: null,
   };
@@ -61,7 +66,7 @@ function deepMerge(a, b) {
 export class QrEngine {
   constructor(config = defaultConfig(), data = "") {
     this.config = { ...config, data };
-    this.instance = new QRCodeStyling(this.config);
+    this.instance = new QRCodeJs(this.config);
     this._container = null;
   }
   mount(container) {
@@ -77,12 +82,19 @@ export class QrEngine {
     Object.assign(this.config, partial);
     this.instance.update(this.config);
   }
+  // Recreate the underlying instance from current config.
+  // Use when properties are REMOVED (e.g. dropping `gradient`) — the library's
+  // .update() does a deep-merge and won't clear stale properties on its own.
+  rebuild() {
+    this.instance = new QRCodeJs({ ...this.config });
+    if (this._container) {
+      this._container.innerHTML = "";
+      this.instance.append(this._container);
+    }
+  }
   replaceConfig(newConfig) {
     this.config = { ...newConfig, data: this.config.data };
     this.instance.update(this.config);
-  }
-  async toBlob(format = "png") {
-    return this.instance.getRawData(format);
   }
   async download(filename, format = "png") {
     return this.instance.download({ name: filename, extension: format });

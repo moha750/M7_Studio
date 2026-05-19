@@ -11,13 +11,22 @@ import * as i18n from "./lib/i18n.js";
 const D2R = (d) => (d * Math.PI) / 180;
 const R2D = (r) => (r * 180) / Math.PI;
 
+// Convert a camelCase or kebab-case shape id ("extraRounded" / "extra-rounded")
+// into a friendly title ("Extra Rounded").
+function formatShapeLabel(id) {
+  return String(id)
+    .replace(/[-_]/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
 function radioGroup(container, options, current, onChange) {
   container.innerHTML = "";
   options.forEach(opt => {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "radio-chip__label";
-    btn.textContent = opt;
+    btn.textContent = formatShapeLabel(opt);
     btn.classList.toggle("active", opt === current);
     on(btn, "click", () => {
       [...container.children].forEach(c => c.classList.remove("active"));
@@ -32,55 +41,112 @@ export function bindControls(engine, onChange) {
   const trigger = debounce(() => onChange(engine.config), 80);
 
   // ------------ Colors ------------
-  const fg  = $("#fg-color");
-  const bg  = $("#bg-color");
-  const useGradient = $("#use-gradient");
-  const gradientType = $("#gradient-type");
-  const gradColor2 = $("#gradient-color2");
-  const gradRotation = $("#gradient-rotation");
-  const gradRow = $("#gradient-row");
+  // Rules:
+  //  - One mode at a time: solid OR gradient, exclusive.
+  //  - Gradient applies to the main dots only. Corners always solid (clean look + scan reliability).
+  //  - Corner colors follow the main color by default; user can override via "Customize corners".
+  //  - Background is independent (transparent by default).
+  // qr-code-styling deep-merges on .update() and won't drop a removed `gradient`, so we use
+  // engine.rebuild() to recreate the instance whenever the mode might leave stale state.
+  const modeChips        = $$("#color-mode .radio-chip__label");
+  const solidPane        = $("#color-solid");
+  const gradientPane     = $("#color-gradient");
+  const fgSolid          = $("#fg-color");
+  const gradC1           = $("#grad-color1");
+  const gradC2           = $("#grad-color2");
+  const gradType         = $("#grad-type");
+  const gradAngle        = $("#grad-angle");
+  const useCustomCorners = $("#use-custom-corners");
+  const customCornersRow = $("#custom-corners-row");
+  const cornerSqColor    = $("#corner-sq-color");
+  const cornerDotColor   = $("#corner-dot-color");
+  const useBg = $("#use-bg");
+  const bgRow = $("#bg-row");
+  const bg    = $("#bg-color");
 
-  function setFgColor(c) {
-    delete engine.config.dotsOptions.gradient;
-    engine.config.dotsOptions.color = c;
-    engine.config.cornersSquareOptions.color = c;
-    engine.config.cornersDotOptions.color = c;
-    engine.update({});
+  let colorMode = "solid"; // "solid" | "gradient"
+
+  function setColorModeUI(mode) {
+    colorMode = mode;
+    modeChips.forEach(c => c.classList.toggle("active", c.dataset.mode === mode));
+    solidPane.classList.toggle("hidden", mode !== "solid");
+    gradientPane.classList.toggle("hidden", mode !== "gradient");
+  }
+
+  function mainColor() {
+    return colorMode === "solid" ? fgSolid.value : gradC1.value;
+  }
+
+  function applyForeground() {
+    const dotsType      = engine.config.dotsOptions?.type          || "rounded";
+    const cornerSqType  = engine.config.cornersSquareOptions?.type || "rounded";
+    const cornerDotType = engine.config.cornersDotOptions?.type    || "rounded";
+
+    // Build dotsOptions fresh (replace, don't mutate — to avoid sticky gradient).
+    if (colorMode === "solid") {
+      engine.config.dotsOptions = { type: dotsType, color: fgSolid.value };
+    } else {
+      const c1 = gradC1.value;
+      const c2 = gradC2.value;
+      const grad = {
+        type: gradType.value,
+        rotation: D2R(parseFloat(gradAngle.value) || 0),
+        colorStops: [
+          { offset: 0, color: c1 },
+          { offset: 1, color: c2 },
+        ],
+      };
+      engine.config.dotsOptions = { type: dotsType, color: c1, gradient: grad };
+    }
+
+    // Corners are always solid. Follow main color unless user customized.
+    const sqColor  = useCustomCorners.checked ? cornerSqColor.value  : mainColor();
+    const dotColor = useCustomCorners.checked ? cornerDotColor.value : mainColor();
+    engine.config.cornersSquareOptions = { type: cornerSqType,  color: sqColor };
+    engine.config.cornersDotOptions    = { type: cornerDotType, color: dotColor };
+
+    engine.rebuild();
     trigger();
   }
+
   function setBgColor(c) {
     engine.config.backgroundOptions.color = c;
     engine.update({});
     trigger();
   }
-  function rebuildGradient() {
-    if (!useGradient.checked) {
-      delete engine.config.dotsOptions.gradient;
-      delete engine.config.cornersSquareOptions.gradient;
-      engine.update({});
-      trigger();
-      return;
-    }
-    const grad = {
-      type: gradientType.value,
-      rotation: D2R(parseFloat(gradRotation.value || 0)),
-      colorStops: [
-        { offset: 0, color: fg.value },
-        { offset: 1, color: gradColor2.value },
-      ],
-    };
-    engine.config.dotsOptions.gradient = grad;
-    engine.config.cornersSquareOptions.gradient = { ...grad };
-    engine.update({});
-    trigger();
-  }
 
-  on(fg, "input", () => { if (useGradient.checked) rebuildGradient(); else setFgColor(fg.value); });
+  modeChips.forEach(chip => {
+    on(chip, "click", () => {
+      setColorModeUI(chip.dataset.mode);
+      applyForeground();
+    });
+  });
+
+  on(fgSolid,  "input",  applyForeground);
+  on(gradC1,   "input",  applyForeground);
+  on(gradC2,   "input",  applyForeground);
+  on(gradType, "change", applyForeground);
+  on(gradAngle,"input",  applyForeground);
+
+  on(useCustomCorners, "change", () => {
+    customCornersRow.classList.toggle("hidden", !useCustomCorners.checked);
+    // When turning on, seed corner pickers with the current main color so the
+    // user sees parity before they start tweaking.
+    if (useCustomCorners.checked) {
+      const seed = mainColor();
+      cornerSqColor.value  = seed;
+      cornerDotColor.value = seed;
+    }
+    applyForeground();
+  });
+  on(cornerSqColor,  "input", applyForeground);
+  on(cornerDotColor, "input", applyForeground);
+
   on(bg, "input", () => setBgColor(bg.value));
-  on(useGradient, "change", () => { gradRow.classList.toggle("hidden", !useGradient.checked); rebuildGradient(); });
-  on(gradientType, "change", rebuildGradient);
-  on(gradColor2, "input", rebuildGradient);
-  on(gradRotation, "input", rebuildGradient);
+  on(useBg, "change", () => {
+    bgRow.classList.toggle("hidden", !useBg.checked);
+    setBgColor(useBg.checked ? bg.value : "transparent");
+  });
 
   // ------------ Shapes ------------
   radioGroup($("#dots-style"), DOTS_STYLES, engine.config.dotsOptions.type, (v) => {
@@ -94,32 +160,93 @@ export function bindControls(engine, onChange) {
   });
 
   // ------------ Logo ------------
-  const logoInput  = $("#logo-input");
-  const logoSize   = $("#logo-size");
-  const logoHide   = $("#logo-hide-dots");
-  const logoRemove = $("#logo-remove");
-  const logoPreview= $("#logo-preview");
+  const logoInput    = $("#logo-input");
+  const logoSize     = $("#logo-size");
+  const logoHide     = $("#logo-hide-dots");
+  const logoRemove   = $("#logo-remove");
+  const logoPreview  = $("#logo-preview");
+  const logoActions  = $("#logo-actions");
+  const logoRemoveBg = $("#logo-remove-bg");
+  const logoRestoreBg = $("#logo-restore-bg");
+  const logoBgTools  = $("#logo-bg-tools");
+  const bgTolerance  = $("#bg-tolerance");
+  const bgToleranceVal = $("#bg-tolerance-val");
+
+  // Holds the unmodified upload so the user can re-apply at different tolerance or restore.
+  let originalLogo = null;
+
+  function showLogoUI(dataUrl) {
+    logoPreview.src = dataUrl;
+    logoPreview.classList.remove("hidden");
+    logoActions.classList.remove("hidden");
+    logoActions.style.display = "flex";
+  }
+  function hideLogoUI() {
+    logoPreview.src = "";
+    logoPreview.classList.add("hidden");
+    logoActions.classList.add("hidden");
+    logoBgTools.classList.add("hidden");
+  }
 
   on(logoInput, "change", async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const url = await readFileAsDataURL(file);
+    originalLogo = url;
     engine.config.image = url;
     engine.update({});
-    logoPreview.src = url;
-    logoPreview.classList.remove("hidden");
-    logoRemove.classList.remove("hidden");
+    showLogoUI(url);
+    logoBgTools.classList.add("hidden");
     trigger();
   });
+
   on(logoRemove, "click", () => {
+    originalLogo = null;
     engine.config.image = null;
     engine.update({});
     logoInput.value = "";
-    logoPreview.src = "";
-    logoPreview.classList.add("hidden");
-    logoRemove.classList.add("hidden");
+    hideLogoUI();
     trigger();
   });
+
+  on(logoRemoveBg, "click", async () => {
+    if (!originalLogo) return;
+    logoRemoveBg.disabled = true;
+    try {
+      const processed = await removeImageBackground(originalLogo, parseInt(bgTolerance.value, 10));
+      engine.config.image = processed;
+      engine.update({});
+      logoPreview.src = processed;
+      logoBgTools.classList.remove("hidden");
+      trigger();
+    } finally {
+      logoRemoveBg.disabled = false;
+    }
+  });
+
+  const applyTolerance = debounce(async () => {
+    if (!originalLogo) return;
+    const processed = await removeImageBackground(originalLogo, parseInt(bgTolerance.value, 10));
+    engine.config.image = processed;
+    engine.update({});
+    logoPreview.src = processed;
+    trigger();
+  }, 120);
+
+  on(bgTolerance, "input", () => {
+    bgToleranceVal.textContent = bgTolerance.value;
+    applyTolerance();
+  });
+
+  on(logoRestoreBg, "click", () => {
+    if (!originalLogo) return;
+    engine.config.image = originalLogo;
+    engine.update({});
+    logoPreview.src = originalLogo;
+    logoBgTools.classList.add("hidden");
+    trigger();
+  });
+
   on(logoSize, "input", () => {
     engine.config.imageOptions.imageSize = parseFloat(logoSize.value);
     engine.update({}); trigger();
@@ -143,28 +270,119 @@ export function bindControls(engine, onChange) {
 
   function syncFromConfig() {
     const c = engine.config;
-    fg.value = c.dotsOptions.color || "#6366f1";
-    bg.value = c.backgroundOptions.color || "#ffffff";
-    const hasGrad = !!c.dotsOptions.gradient;
-    useGradient.checked = hasGrad;
-    gradRow.classList.toggle("hidden", !hasGrad);
-    if (hasGrad) {
-      gradientType.value = c.dotsOptions.gradient.type || "linear";
-      gradColor2.value = c.dotsOptions.gradient.colorStops?.[1]?.color || "#a855f7";
-      gradRotation.value = Math.round(R2D(c.dotsOptions.gradient.rotation || 0));
+
+    // Background
+    const bgColor = c.backgroundOptions?.color;
+    const hasBg = !!bgColor && bgColor !== "transparent" && bgColor !== "rgba(0,0,0,0)";
+    useBg.checked = hasBg;
+    bgRow.classList.toggle("hidden", !hasBg);
+    bg.value = hasBg ? bgColor : "#ffffff";
+
+    // Foreground — detect mode from saved config
+    const grad = c.dotsOptions?.gradient;
+    let main;
+    if (grad) {
+      setColorModeUI("gradient");
+      gradC1.value    = grad.colorStops?.[0]?.color || "#6366f1";
+      gradC2.value    = grad.colorStops?.[1]?.color || "#a855f7";
+      gradType.value  = grad.type || "linear";
+      gradAngle.value = Math.round(R2D(grad.rotation || 0));
+      main = gradC1.value;
+    } else {
+      setColorModeUI("solid");
+      fgSolid.value = c.dotsOptions?.color || "#6366f1";
+      main = fgSolid.value;
     }
+
+    // Detect whether corners use custom colors (different from main color).
+    const sqHex  = (c.cornersSquareOptions?.color || main).toLowerCase();
+    const dotHex = (c.cornersDotOptions?.color    || main).toLowerCase();
+    const cornersCustom = sqHex !== main.toLowerCase() || dotHex !== main.toLowerCase();
+    useCustomCorners.checked = cornersCustom;
+    customCornersRow.classList.toggle("hidden", !cornersCustom);
+    if (cornersCustom) {
+      cornerSqColor.value  = c.cornersSquareOptions?.color || main;
+      cornerDotColor.value = c.cornersDotOptions?.color    || main;
+    }
+
     margin.value = c.margin ?? 8;
     logoSize.value = c.imageOptions?.imageSize ?? 0.25;
     logoHide.checked = c.imageOptions?.hideBackgroundDots ?? true;
     if (c.image) {
-      logoPreview.src = c.image;
-      logoPreview.classList.remove("hidden");
-      logoRemove.classList.remove("hidden");
+      originalLogo = originalLogo || c.image;
+      showLogoUI(c.image);
+    } else {
+      hideLogoUI();
     }
   }
 
   syncFromConfig();
   return { syncFromConfig };
+}
+
+// Edge-sample dominant color + remove similar pixels with soft-edge falloff.
+// tolerance: 5–80, higher = removes more aggressively.
+async function removeImageBackground(dataUrl, tolerance) {
+  const img = await loadImage(dataUrl);
+  const w = img.naturalWidth || img.width;
+  const h = img.naturalHeight || img.height;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0, w, h);
+
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const px = imgData.data;
+
+  // Sample edge pixels to estimate background color (median per channel).
+  const rs = [], gs = [], bs = [];
+  const stepX = Math.max(1, Math.floor(w / 60));
+  const stepY = Math.max(1, Math.floor(h / 60));
+  const sample = (x, y) => {
+    const i = (y * w + x) * 4;
+    if (px[i + 3] < 8) return; // skip already-transparent pixels
+    rs.push(px[i]); gs.push(px[i + 1]); bs.push(px[i + 2]);
+  };
+  for (let x = 0; x < w; x += stepX) { sample(x, 0); sample(x, h - 1); }
+  for (let y = stepY; y < h - 1; y += stepY) { sample(0, y); sample(w - 1, y); }
+  if (!rs.length) return dataUrl;
+
+  const median = (arr) => {
+    const s = arr.slice().sort((a, b) => a - b);
+    return s[Math.floor(s.length / 2)];
+  };
+  const bgR = median(rs), bgG = median(gs), bgB = median(bs);
+
+  // Map slider 5–80 → distance threshold (roughly 30 → light cleanup, 80 → aggressive).
+  const maxDist = (tolerance / 100) * 220;
+  const softZone = maxDist * 0.35; // smooth edges instead of hard cut
+
+  for (let i = 0; i < px.length; i += 4) {
+    const dr = px[i] - bgR;
+    const dg = px[i + 1] - bgG;
+    const db = px[i + 2] - bgB;
+    const dist = Math.sqrt(dr * dr + dg * dg + db * db);
+    if (dist < maxDist - softZone) {
+      px[i + 3] = 0;
+    } else if (dist < maxDist) {
+      const t = (dist - (maxDist - softZone)) / softZone;
+      px[i + 3] = Math.round(px[i + 3] * t);
+    }
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+  return canvas.toDataURL("image/png");
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload  = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
 }
 
 // Render the static control-panel markup. Returns the host element.
@@ -191,36 +409,71 @@ export function renderControlsPanel(host) {
     </div>
 
     <div class="tab-panel active" data-panel="colors" role="tabpanel">
-      <div class="grid" style="grid-template-columns:1fr 1fr;gap:var(--space-4);">
-        <div class="field">
-          <label class="field-label" data-i18n="create.fg_color" for="fg-color">Foreground</label>
-          <input id="fg-color" type="color" class="input-color" value="#6366f1"/>
-        </div>
-        <div class="field">
-          <label class="field-label" data-i18n="create.bg_color" for="bg-color">Background</label>
-          <input id="bg-color" type="color" class="input-color" value="#ffffff"/>
+      <div class="field">
+        <label class="field-label" data-i18n="create.color_label">Code color</label>
+        <div id="color-mode" class="radio-chips">
+          <button type="button" class="radio-chip__label active" data-mode="solid" data-i18n="create.color_solid">Solid</button>
+          <button type="button" class="radio-chip__label" data-mode="gradient" data-i18n="create.color_gradient">Gradient</button>
         </div>
       </div>
+
+      <div id="color-solid" class="field mt-4">
+        <input id="fg-color" type="color" class="input-color" value="#6366f1"/>
+      </div>
+
+      <div id="color-gradient" class="hidden mt-4">
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:var(--space-3);">
+          <div class="field">
+            <label class="field-label" data-i18n="create.gradient_color1" for="grad-color1">Color 1</label>
+            <input id="grad-color1" type="color" class="input-color" value="#6366f1"/>
+          </div>
+          <div class="field">
+            <label class="field-label" data-i18n="create.gradient_color2" for="grad-color2">Color 2</label>
+            <input id="grad-color2" type="color" class="input-color" value="#a855f7"/>
+          </div>
+        </div>
+        <div class="grid mt-3" style="grid-template-columns:1fr 1fr;gap:var(--space-3);">
+          <div class="field">
+            <label class="field-label" data-i18n="create.gradient_type" for="grad-type">Type</label>
+            <select id="grad-type" class="select">
+              <option value="linear" data-i18n="create.gradient_linear">Linear</option>
+              <option value="radial" data-i18n="create.gradient_radial">Radial</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" data-i18n="create.gradient_rotation" for="grad-angle">Angle</label>
+            <input id="grad-angle" type="range" min="0" max="360" value="45" class="input-range"/>
+          </div>
+        </div>
+        <div class="field-hint mt-2" data-i18n="create.gradient_note">Gradient applies to the dots only.</div>
+      </div>
+
       <label class="switch mt-5">
-        <input id="use-gradient" type="checkbox"/>
+        <input id="use-custom-corners" type="checkbox"/>
         <span class="switch__track"></span>
-        <span data-i18n="create.gradient_toggle">Use gradient</span>
+        <span data-i18n="create.customize_corners">Customize corner colors</span>
       </label>
-      <div id="gradient-row" class="grid hidden mt-4" style="grid-template-columns:1fr 1fr 1fr;gap:var(--space-3);">
-        <div class="field">
-          <label class="field-label" data-i18n="create.gradient_type" for="gradient-type">Type</label>
-          <select id="gradient-type" class="select">
-            <option value="linear" data-i18n="create.gradient_linear">Linear</option>
-            <option value="radial" data-i18n="create.gradient_radial">Radial</option>
-          </select>
+      <div id="custom-corners-row" class="hidden mt-3">
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:var(--space-3);">
+          <div class="field">
+            <label class="field-label" data-i18n="create.corner_square" for="corner-sq-color">Corner square</label>
+            <input id="corner-sq-color" type="color" class="input-color" value="#6366f1"/>
+          </div>
+          <div class="field">
+            <label class="field-label" data-i18n="create.corner_dot" for="corner-dot-color">Corner dot</label>
+            <input id="corner-dot-color" type="color" class="input-color" value="#6366f1"/>
+          </div>
         </div>
-        <div class="field">
-          <label class="field-label" data-i18n="create.gradient_color2" for="gradient-color2">Color 2</label>
-          <input id="gradient-color2" type="color" class="input-color" value="#a855f7"/>
-        </div>
-        <div class="field">
-          <label class="field-label" data-i18n="create.gradient_rotation" for="gradient-rotation">Rotation</label>
-          <input id="gradient-rotation" type="range" min="0" max="360" value="45" class="input-range"/>
+      </div>
+
+      <div style="border-top:1px solid var(--border);margin-top:var(--space-6);padding-top:var(--space-5);">
+        <label class="switch">
+          <input id="use-bg" type="checkbox"/>
+          <span class="switch__track"></span>
+          <span data-i18n="create.use_bg">Add background color</span>
+        </label>
+        <div id="bg-row" class="field hidden mt-3">
+          <input id="bg-color" type="color" class="input-color" value="#ffffff"/>
         </div>
       </div>
     </div>
@@ -247,7 +500,26 @@ export function renderControlsPanel(host) {
         <input id="logo-input" type="file" accept="image/png,image/jpeg,image/svg+xml"/>
       </label>
       <img id="logo-preview" class="hidden" alt="" style="max-width:64px;max-height:64px;margin-top:var(--space-2);border-radius:var(--radius-2);background:var(--bg-subtle);padding:6px;"/>
-      <button id="logo-remove" type="button" class="btn btn-ghost btn-sm hidden mt-2" data-i18n="create.remove_logo">Remove logo</button>
+
+      <div id="logo-actions" class="hidden" style="display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-2);">
+        <button id="logo-remove-bg" type="button" class="btn btn-secondary btn-sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M3 3h18v18H3z" opacity=".2"/><path d="m5 21 6-6 4 4 8-8"/><circle cx="8" cy="8" r="2"/></svg>
+          <span data-i18n="create.remove_bg">Remove background</span>
+        </button>
+        <button id="logo-remove" type="button" class="btn btn-ghost btn-sm" data-i18n="create.remove_logo">Remove logo</button>
+      </div>
+
+      <div id="logo-bg-tools" class="hidden mt-4">
+        <div class="field">
+          <label class="field-label" for="bg-tolerance" style="display:flex;justify-content:space-between;">
+            <span data-i18n="create.bg_tolerance">Tolerance</span>
+            <span id="bg-tolerance-val" class="text-muted" style="font-weight:500;">30</span>
+          </label>
+          <input id="bg-tolerance" type="range" min="5" max="80" value="30" class="input-range"/>
+        </div>
+        <button id="logo-restore-bg" type="button" class="btn btn-ghost btn-sm mt-2" data-i18n="create.restore_bg">Restore original</button>
+      </div>
+
       <div class="field mt-5">
         <label class="field-label" for="logo-size" data-i18n="create.logo_size">Logo size</label>
         <input id="logo-size" type="range" min="0.10" max="0.40" step="0.02" value="0.25" class="input-range"/>
