@@ -107,8 +107,29 @@ h2{font-size:clamp(26px,4.4vw,38px);font-weight:700;letter-spacing:-.01em}
 .score b{font:700 clamp(72px,16vw,120px)/.9 "Readex",sans-serif;letter-spacing:-.03em}
 .score div{padding-bottom:10px}
 .score small{display:block;color:var(--ink-2);font:500 15px "Readex",sans-serif}
-.praise{list-style:none;padding:0;margin:30px 0 0;display:grid;gap:12px}
-.praise li{padding:16px 20px;border-radius:var(--r-sm);background:var(--paper);border-inline-start:4px solid var(--wood);font-weight:500}
+.quotes{display:grid;gap:14px;margin-top:30px}
+.q{margin:0;padding:20px 22px;border-radius:var(--r-sm);background:var(--paper);border-inline-start:4px solid var(--wood)}
+.q blockquote{margin:0;font-weight:500;line-height:1.85}
+.q figcaption{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-top:12px;font:500 14px "Readex",sans-serif;color:var(--ink-2)}
+.q figcaption b{color:var(--espresso);font-weight:600}
+.q .stars{font-size:13px;letter-spacing:1px}
+
+/* visit */
+.visit{padding:64px 0;background:var(--paper)}
+.visit-grid{display:grid;gap:28px}
+.map{border-radius:var(--r-lg);overflow:hidden;aspect-ratio:4/3;background:var(--alu-hi)}
+.map iframe{display:block;width:100%;height:100%;border:0}
+.facts{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:14px}
+.facts li{display:grid;gap:2px}
+.facts small{font:500 14px "Readex",sans-serif;color:var(--ink-2)}
+.facts span,.facts a{font-weight:500;font-size:18px}
+.facts a{justify-self:start;unicode-bidi:isolate}
+.visit .actions{margin-top:24px}
+.social{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px;padding-top:24px;border-top:1px solid var(--alu-hi)}
+.social p{flex-basis:100%;margin:0 0 4px;font:500 15px "Readex",sans-serif;color:var(--ink-2)}
+.social a{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--espresso);text-decoration:none;font:600 15px "Readex",sans-serif}
+.social a:hover{background:var(--espresso);color:var(--porcelain)}
+.social svg{width:20px;height:20px}
 .reviews .more{display:inline-block;margin-top:22px;font:500 15px "Readex",sans-serif;color:var(--ink-2)}
 
 /* request */
@@ -152,8 +173,9 @@ dialog img{max-height:84vh;width:auto;margin:auto;border-radius:8px}
   .wall{grid-template-columns:repeat(4,1fr);grid-auto-rows:240px}
   .wall li:first-child{grid-column:span 2}
   .how-grid{grid-template-columns:1fr 1fr;align-items:center;gap:64px}
-  .reviews .wrap{display:grid;grid-template-columns:1fr 1.2fr;gap:64px;align-items:start}
-  .praise{margin-top:0}
+  .reviews .wrap{display:grid;grid-template-columns:.7fr 2fr;gap:56px;align-items:start}
+  .quotes{margin-top:0;grid-template-columns:1fr 1fr}
+  .visit-grid{grid-template-columns:1.15fr 1fr;align-items:center;gap:64px}
   .bar{display:none}
   .ask{padding-bottom:80px}
   footer{padding-bottom:40px}
@@ -165,7 +187,7 @@ dialog img{max-height:84vh;width:auto;margin:auto;border-radius:8px}
   <div class="wrap">
     <a class="brand" href="#"><b>مزون</b><span>لمطابخ الألمنيوم</span></a>
     <nav class="nav" aria-label="أقسام الصفحة">
-      <a href="#works">أعمالنا</a><a href="#how">كيف نشتغل</a><a href="#reviews">التقييمات</a><a href="#ask">زيارة قياس</a>
+      <a href="#works">أعمالنا</a><a href="#how">كيف نشتغل</a><a href="#reviews">التقييمات</a><a href="#visit">موقعنا</a><a href="#ask">زيارة قياس</a>
     </nav>
     <a class="btn btn-wa btn-sm" href="#ask">اطلب زيارة قياس</a>
   </div>
@@ -235,13 +257,36 @@ dialog img{max-height:84vh;width:auto;margin:auto;border-radius:8px}
         <div class="score"><b>٤٫٩</b><div><span class="stars" aria-hidden="true">★★★★★</span><small>من ٨٨ تقييم</small></div></div>
         <a class="more" href="https://www.google.com/maps/search/?api=1&query=%D9%85%D8%B2%D9%88%D9%86+%D9%84%D9%84%D9%85%D8%B7%D8%A7%D8%A8%D8%AE+%D8%A7%D9%84%D8%A7%D9%84%D9%85%D9%86%D9%8A%D9%88%D9%85&query_place_id=ChIJxUXGaDv9ST4RogmHFSXyGK0" target="_blank" rel="noopener">اقرأ التقييمات في قوقل</a>
       </div>
+      <div class="quotes">
+        <figure class="q"><blockquote>اولاً اشكر ابو محمد علئ الشغل الجميل والمرتب وطبعاً ماتعبت نفسي بالكلام وريته التصميم الي ابيه واشتغل لي عليه بالضبط ، ودقه بالمواعيد والحضور ويوم جا ركبو المطبخ بصررراحه دقه بالتركيب والاحتراف ولا احتجت اقولهم انه يعدلون اي حاجه بالمطبخ …</blockquote><figcaption><span class="stars" aria-label="٥ نجوم">★★★★★</span><b>Areej Majed</b><span>قبل سنتين</span></figcaption></figure>
+        <figure class="q"><blockquote>الأستاذ بو محمد قمة في التعامل. خدمة تركيب ممتازة و مواعيد دقيقة. جودة في الصناعة. انصح به بشدة.</blockquote><figcaption><span class="stars" aria-label="٥ نجوم">★★★★★</span><b>Salman Al-Khars</b><span>قبل ٩ أشهر</span></figcaption></figure>
+        <figure class="q"><blockquote>انصح وبشده بالتعامل مع هذا المعرض الشغل راقي والمواعيد ممتازه فصلت عندهم مطبخ باقل من ٢٠ يوم كان راكب ماشاء الله ومعامله الاخ مازن في قمه الزوق</blockquote><figcaption><span class="stars" aria-label="٥ نجوم">★★★★★</span><b>MAMDOUH Sayed</b><span>قبل ٣ سنوات</span></figcaption></figure>
+        <figure class="q"><blockquote>ماشاء الله. قسم بربي تفاجئت بالمعامله الطيبه والشغل السريع ودقه الموعد واسعارهم جدا طيبه. واشكر الاخ مازن على الابداع في تصميم المطبخ. نصحني باشياء في التصميم وكانت روعه.</blockquote><figcaption><span class="stars" aria-label="٥ نجوم">★★★★★</span><b>حمد ابو زينه</b><span>قبل ٣ سنوات</span></figcaption></figure>
+        <figure class="q"><blockquote>جودة ممتازة جدا، مناسبة للسعر. تعامل راقي من ابومحمد، ينصح ويخدم ويلتزم بالوقت والتفاصيل</blockquote><figcaption><span class="stars" aria-label="٥ نجوم">★★★★★</span><b>Inspire Production</b><span>قبل سنتين</span></figcaption></figure>
+        <figure class="q"><blockquote>بصراحه محلهم صغير بس يفوق على المحلات الكبيره بنسبه للكواليتي والسعر وسرعة الانجاز وصدق والامانة الله يبارك لهم</blockquote><figcaption><span class="stars" aria-label="٥ نجوم">★★★★★</span><b>Amal Abu-Ushba</b><span>قبل ٣ سنوات</span></figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="visit" id="visit">
+    <div class="wrap visit-grid">
+      <div class="map">
+        <iframe src="https://maps.google.com/maps?q=%D9%85%D8%B2%D9%88%D9%86%20%D9%84%D9%84%D9%85%D8%B7%D8%A7%D8%A8%D8%AE%20%D8%A7%D9%84%D8%A7%D9%84%D9%85%D9%86%D9%8A%D9%88%D9%85&amp;ll=26.4524417,50.0715341&amp;z=16&amp;hl=ar&amp;output=embed" title="موقع معرض مزون على الخريطة" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      </div>
       <div>
-        <p class="lead" style="margin:0 0 16px">أكثر شي يذكره عملاؤنا في تقييماتهم:</p>
-        <ul class="praise">
-          <li>الالتزام بالمواعيد، من القياس إلى التركيب</li>
-          <li>ينفذ التصميم مثل ما يبيه العميل بالضبط</li>
-          <li>جودة شغل عالية بسعر مناسب</li>
+        <h2>زورونا في المعرض</h2>
+        <ul class="facts">
+          <li><small>العنوان</small><span>شارع الملك عبدالعزيز، حي العزيزية، الدمام</span></li>
+          <li><small>ساعات العمل</small><span>كل يوم، من ٤ العصر إلى ١١ الليل</span></li>
+          <li><small>الجوال</small><a href="tel:+966563501190" dir="ltr">056 350 1190</a></li>
         </ul>
+        <div class="actions">
+          <a class="btn btn-line" href="https://www.google.com/maps/search/?api=1&query=%D9%85%D8%B2%D9%88%D9%86+%D9%84%D9%84%D9%85%D8%B7%D8%A7%D8%A8%D8%AE+%D8%A7%D9%84%D8%A7%D9%84%D9%85%D9%86%D9%8A%D9%88%D9%85&query_place_id=ChIJxUXGaDv9ST4RogmHFSXyGK0" target="_blank" rel="noopener">افتح الموقع في قوقل ماب</a>
+        </div>
+        <div class="social">
+          <p>تابعونا وتواصلوا معنا</p>
+        <a href="https://wa.me/966563501190" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>واتساب</a>
+        </div>
       </div>
     </div>
   </section>
